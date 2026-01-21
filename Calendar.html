@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Work Calendar Smooth</title>
+
+<style>
+:root{
+    --work:#22c55e;
+    --leave:#ef4444;
+    --late:#f97316;
+    --site:#2563eb;
+    --off:#94a3b8;
+}
+*{box-sizing:border-box}
+body{
+    margin:0;
+    min-height:100vh;
+    font-family:"Segoe UI",system-ui;
+    background:linear-gradient(135deg,#7dd3fc,#a78bfa,#60a5fa);
+    background-size:300% 300%;
+    animation:bgMove 12s ease infinite;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+@keyframes bgMove{
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+}
+.app{
+    width:95%;
+    max-width:1350px;
+    background:rgba(255,255,255,.35);
+    backdrop-filter:blur(22px);
+    border-radius:28px;
+    padding:22px;
+    box-shadow:0 40px 90px rgba(0,0,0,.35);
+}
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:16px;
+}
+.header h1{
+    margin:0;
+    font-size:30px;
+    font-weight:900;
+    background:linear-gradient(90deg,#e0f2fe,#ede9fe);
+    -webkit-background-clip:text;
+    color:transparent;
+}
+.controls select{
+    padding:8px 16px;
+    border-radius:18px;
+    border:none;
+    font-weight:700;
+}
+.calendar{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:14px;
+}
+.day-name{
+    text-align:center;
+    font-weight:800;
+    color:#fff;
+    padding:10px;
+    border-radius:16px;
+    background:rgba(0,0,0,.35);
+}
+.day{
+    background:linear-gradient(180deg,#ffffff,#f1f5f9);
+    border-radius:22px;
+    padding:10px;
+    min-height:185px;
+    display:flex;
+    flex-direction:column;
+    font-size:11px;
+    border-top:6px solid transparent;
+    transition:.3s;
+}
+.day:hover{transform:translateY(-6px)}
+.day.work{border-color:var(--work)}
+.day.leave{border-color:var(--leave)}
+.day.late{border-color:var(--late)}
+.day.site{border-color:var(--site)}
+.day.off{border-color:var(--off)}
+.date{
+    text-align:right;
+    font-weight:900;
+    font-size:13px;
+    color:#0f172a;
+}
+select,input,textarea{
+    margin-top:6px;
+    width:100%;
+    border:none;
+    border-radius:14px;
+    padding:7px 10px;
+    font-size:11px;
+    font-family:inherit;
+    background:rgba(255,255,255,.88);
+    color:#0f172a;
+    box-shadow:
+        inset 0 2px 4px rgba(0,0,0,.12),
+        0 4px 10px rgba(0,0,0,.12);
+    transition:.25s;
+}
+select:focus,input:focus,textarea:focus{
+    outline:none;
+    transform:scale(1.03);
+    box-shadow:
+        0 0 0 2px rgba(96,165,250,.6),
+        inset 0 2px 6px rgba(0,0,0,.18),
+        0 8px 22px rgba(96,165,250,.45);
+}
+textarea{resize:none;min-height:52px}
+</style>
+</head>
+
+<body>
+<div class="app">
+    <div class="header">
+        <h1 id="title"></h1>
+        <div class="controls">
+            <select id="month"></select>
+            <select id="year"></select>
+        </div>
+    </div>
+
+    <div class="calendar" id="calendar">
+        <div class="day-name">อาทิตย์</div>
+        <div class="day-name">จันทร์</div>
+        <div class="day-name">อังคาร</div>
+        <div class="day-name">พุธ</div>
+        <div class="day-name">พฤหัสบดี</div>
+        <div class="day-name">ศุกร์</div>
+        <div class="day-name">เสาร์</div>
+    </div>
+</div>
+
+<script>
+const months=["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน",
+              "กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+
+const cal=document.getElementById("calendar");
+const title=document.getElementById("title");
+const mSel=document.getElementById("month");
+const ySel=document.getElementById("year");
+
+months.forEach((m,i)=>mSel.add(new Option(m,i)));
+for(let y=2020;y<=2035;y++) ySel.add(new Option(y,y));
+
+/* ===== Restore Month / Year ===== */
+const savedMonth=localStorage.getItem("wc-month");
+const savedYear =localStorage.getItem("wc-year");
+
+if(savedMonth!==null) mSel.value=savedMonth;
+if(savedYear!==null)  ySel.value=savedYear;
+
+const key=(y,m,d)=>`wc-${y}-${m}-${d}`;
+const load=k=>JSON.parse(localStorage.getItem(k)||"{}");
+const save=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+
+function render(){
+    cal.querySelectorAll(".day").forEach(e=>e.remove());
+    const m=+mSel.value,y=+ySel.value;
+    title.textContent=`ปฏิทินการทำงาน – ${months[m]} ${y}`;
+
+    const first=new Date(y,m,1).getDay();
+    const days=new Date(y,m+1,0).getDate();
+    let d=1;
+
+    for(let i=0;i<42;i++){
+        const cell=document.createElement("div");
+        cell.className="day";
+
+        if(i>=first && d<=days){
+            const k=key(y,m,d);
+            const data=load(k);
+
+            cell.innerHTML=`
+                <div class="date">${d}</div>
+                <select>
+                    <option value="">สถานะ</option>
+                    <option value="work">ทำงาน</option>
+                    <option value="leave">ลา</option>
+                    <option value="late">มาสาย</option>
+                    <option value="site">ออกไซต์</option>
+                    <option value="off">หยุด</option>
+                </select>
+                <input type="time">
+                <input type="time">
+                <input placeholder="Site">
+                <textarea placeholder="หมายเหตุ"></textarea>
+            `;
+
+            const els=cell.querySelectorAll("select,input,textarea");
+            const fields=["status","in","out","site","note"];
+
+            fields.forEach((f,i)=>{
+                if(data[f]) els[i].value=data[f];
+            });
+
+            if(data.status) cell.classList.add(data.status);
+
+            els.forEach(el=>{
+                el.oninput=()=>{
+                    const dta={
+                        status:els[0].value,
+                        in:els[1].value,
+                        out:els[2].value,
+                        site:els[3].value,
+                        note:els[4].value
+                    };
+                    save(k,dta);
+                    cell.className="day "+(dta.status||"");
+                };
+            });
+
+            d++;
+        }
+        cal.appendChild(cell);
+    }
+}
+
+/* ===== Save Month / Year ===== */
+mSel.onchange=()=>{
+    localStorage.setItem("wc-month",mSel.value);
+    render();
+};
+ySel.onchange=()=>{
+    localStorage.setItem("wc-year",ySel.value);
+    render();
+};
+
+/* ===== Scroll Memory ===== */
+window.addEventListener("scroll",()=>{
+    localStorage.setItem("wc-scroll",window.scrollY);
+});
+window.addEventListener("load",()=>{
+    const y=localStorage.getItem("wc-scroll");
+    if(y) window.scrollTo(0,+y);
+});
+
+render();
+</script>
+</body>
+</html>
