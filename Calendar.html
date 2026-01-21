@@ -2,10 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-
-<!-- ✅ Mobile / iOS / Android -->
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-
 <title>Work Calendar Smooth</title>
 
 <style>
@@ -62,9 +59,11 @@ body{
     border:none;
     font-weight:700;
 }
+
+/* ===== Calendar ===== */
 .calendar{
     display:grid;
-    grid-template-columns:repeat(7,1fr);
+    grid-template-columns:repeat(7, minmax(0,1fr));
     gap:14px;
 }
 .day-name{
@@ -98,6 +97,8 @@ body{
     font-size:13px;
     color:#0f172a;
 }
+
+/* ===== Inputs ===== */
 select,input,textarea{
     margin-top:6px;
     width:100%;
@@ -111,15 +112,10 @@ select,input,textarea{
         inset 0 2px 4px rgba(0,0,0,.12),
         0 4px 10px rgba(0,0,0,.12);
     transition:.25s;
-}
-
-/* ✅ iOS Zoom Fix */
-input,select,textarea{
-    font-size:16px;
+    font-size:16px; /* iOS zoom fix */
     -webkit-appearance:none;
     appearance:none;
 }
-
 select:focus,input:focus,textarea:focus{
     outline:none;
     transform:scale(1.03);
@@ -130,20 +126,20 @@ select:focus,input:focus,textarea:focus{
 }
 textarea{resize:none;min-height:52px}
 
-/* ===== Mobile Layout ===== */
-@media (max-width: 900px){
+/* ===== Mobile Fix ===== */
+@media (max-width: 600px){
     body{
         align-items:flex-start;
-        padding:12px;
+        padding:10px;
     }
     .app{
         width:100%;
-        padding:16px;
+        padding:14px;
         border-radius:20px;
     }
     .header{
         flex-direction:column;
-        gap:12px;
+        gap:10px;
     }
     .header h1{
         font-size:22px;
@@ -151,7 +147,7 @@ textarea{resize:none;min-height:52px}
     }
     .controls{
         display:flex;
-        gap:10px;
+        gap:8px;
         width:100%;
     }
     .controls select{
@@ -159,18 +155,25 @@ textarea{resize:none;min-height:52px}
         font-size:14px;
     }
     .calendar{
-        gap:8px;
+        gap:6px;
+    }
+    .day-name{
+        font-size:11px;
+        padding:6px 2px;
+        border-radius:10px;
     }
     .day{
-        min-height:160px;
-        font-size:12px;
+        min-height:140px;
+        padding:6px;
+        border-radius:16px;
+    }
+    .date{
+        font-size:11px;
     }
 }
 
-/* ===== Touch Smooth ===== */
-.day{
-    touch-action:manipulation;
-}
+/* Touch smooth */
+.day{touch-action:manipulation}
 </style>
 </head>
 
@@ -282,7 +285,6 @@ window.addEventListener("load",()=>{
     if(y) window.scrollTo(0,+y);
 });
 
-/* ✅ iOS Scroll Fix */
 document.addEventListener("touchmove",()=>{}, {passive:true});
 
 render();
