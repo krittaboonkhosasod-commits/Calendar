@@ -2,6 +2,10 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
+
+<!-- ✅ Mobile / iOS / Android -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
 <title>Work Calendar Smooth</title>
 
 <style>
@@ -100,7 +104,6 @@ select,input,textarea{
     border:none;
     border-radius:14px;
     padding:7px 10px;
-    font-size:11px;
     font-family:inherit;
     background:rgba(255,255,255,.88);
     color:#0f172a;
@@ -109,6 +112,14 @@ select,input,textarea{
         0 4px 10px rgba(0,0,0,.12);
     transition:.25s;
 }
+
+/* ✅ iOS Zoom Fix */
+input,select,textarea{
+    font-size:16px;
+    -webkit-appearance:none;
+    appearance:none;
+}
+
 select:focus,input:focus,textarea:focus{
     outline:none;
     transform:scale(1.03);
@@ -118,6 +129,48 @@ select:focus,input:focus,textarea:focus{
         0 8px 22px rgba(96,165,250,.45);
 }
 textarea{resize:none;min-height:52px}
+
+/* ===== Mobile Layout ===== */
+@media (max-width: 900px){
+    body{
+        align-items:flex-start;
+        padding:12px;
+    }
+    .app{
+        width:100%;
+        padding:16px;
+        border-radius:20px;
+    }
+    .header{
+        flex-direction:column;
+        gap:12px;
+    }
+    .header h1{
+        font-size:22px;
+        text-align:center;
+    }
+    .controls{
+        display:flex;
+        gap:10px;
+        width:100%;
+    }
+    .controls select{
+        flex:1;
+        font-size:14px;
+    }
+    .calendar{
+        gap:8px;
+    }
+    .day{
+        min-height:160px;
+        font-size:12px;
+    }
+}
+
+/* ===== Touch Smooth ===== */
+.day{
+    touch-action:manipulation;
+}
 </style>
 </head>
 
@@ -154,10 +207,8 @@ const ySel=document.getElementById("year");
 months.forEach((m,i)=>mSel.add(new Option(m,i)));
 for(let y=2020;y<=2035;y++) ySel.add(new Option(y,y));
 
-/* ===== Restore Month / Year ===== */
 const savedMonth=localStorage.getItem("wc-month");
 const savedYear =localStorage.getItem("wc-year");
-
 if(savedMonth!==null) mSel.value=savedMonth;
 if(savedYear!==null)  ySel.value=savedYear;
 
@@ -200,11 +251,7 @@ function render(){
 
             const els=cell.querySelectorAll("select,input,textarea");
             const fields=["status","in","out","site","note"];
-
-            fields.forEach((f,i)=>{
-                if(data[f]) els[i].value=data[f];
-            });
-
+            fields.forEach((f,i)=>{ if(data[f]) els[i].value=data[f]; });
             if(data.status) cell.classList.add(data.status);
 
             els.forEach(el=>{
@@ -220,31 +267,23 @@ function render(){
                     cell.className="day "+(dta.status||"");
                 };
             });
-
             d++;
         }
         cal.appendChild(cell);
     }
 }
 
-/* ===== Save Month / Year ===== */
-mSel.onchange=()=>{
-    localStorage.setItem("wc-month",mSel.value);
-    render();
-};
-ySel.onchange=()=>{
-    localStorage.setItem("wc-year",ySel.value);
-    render();
-};
+mSel.onchange=()=>{ localStorage.setItem("wc-month",mSel.value); render(); };
+ySel.onchange=()=>{ localStorage.setItem("wc-year",ySel.value); render(); };
 
-/* ===== Scroll Memory ===== */
-window.addEventListener("scroll",()=>{
-    localStorage.setItem("wc-scroll",window.scrollY);
-});
+window.addEventListener("scroll",()=>localStorage.setItem("wc-scroll",window.scrollY));
 window.addEventListener("load",()=>{
     const y=localStorage.getItem("wc-scroll");
     if(y) window.scrollTo(0,+y);
 });
+
+/* ✅ iOS Scroll Fix */
+document.addEventListener("touchmove",()=>{}, {passive:true});
 
 render();
 </script>
