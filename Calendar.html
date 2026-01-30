@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Work Calendar Smooth</title>
+<title>Work Calendar (Text Login)</title>
 
 <style>
 :root{
@@ -19,17 +19,37 @@ body{
     min-height:100vh;
     font-family:"Segoe UI",system-ui;
     background:linear-gradient(135deg,#7dd3fc,#a78bfa,#60a5fa);
-    background-size:300% 300%;
-    animation:bgMove 12s ease infinite;
     display:flex;
     justify-content:center;
     align-items:center;
 }
-@keyframes bgMove{
-    0%{background-position:0% 50%}
-    50%{background-position:100% 50%}
-    100%{background-position:0% 50%}
+
+/* ===== LOGIN ===== */
+#loginBox{
+    background:#fff;
+    padding:32px;
+    border-radius:22px;
+    box-shadow:0 20px 50px rgba(0,0,0,.35);
+    text-align:center;
 }
+#loginBox input{
+    width:220px;
+    padding:10px;
+    border-radius:14px;
+    border:none;
+    background:#f1f5f9;
+    font-size:16px;
+}
+#loginBox button{
+    margin-top:14px;
+    padding:10px 24px;
+    border:none;
+    border-radius:20px;
+    font-weight:800;
+    cursor:pointer;
+}
+
+/* ===== APP ===== */
 .app{
     width:95%;
     max-width:1350px;
@@ -37,8 +57,9 @@ body{
     backdrop-filter:blur(22px);
     border-radius:28px;
     padding:22px;
-    box-shadow:0 40px 90px rgba(0,0,0,.35);
 }
+
+/* ===== HEADER ===== */
 .header{
     display:flex;
     justify-content:space-between;
@@ -47,45 +68,59 @@ body{
 }
 .header h1{
     margin:0;
-    font-size:30px;
+    font-size:26px;
     font-weight:900;
-    background:linear-gradient(90deg,#e0f2fe,#ede9fe);
-    -webkit-background-clip:text;
-    color:transparent;
+}
+
+/* ===== CONTROLS ===== */
+.controls{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+.selectors{
+    display:flex;
+    gap:8px;
 }
 .controls select{
-    padding:8px 16px;
+    padding:8px 14px;
     border-radius:18px;
     border:none;
     font-weight:700;
 }
+.logout{
+    background:#ef4444;
+    color:#fff;
+    font-weight:800;
+    padding:8px 20px;
+    border:none;
+    border-radius:20px;
+    cursor:pointer;
+    white-space:nowrap;
+}
+.logout:hover{opacity:.85}
 
-/* ===== Calendar ===== */
+/* ===== CALENDAR ===== */
 .calendar{
     display:grid;
-    grid-template-columns:repeat(7, minmax(0,1fr));
-    gap:14px;
+    grid-template-columns:repeat(7,1fr);
+    gap:12px;
 }
 .day-name{
     text-align:center;
     font-weight:800;
-    color:#fff;
-    padding:10px;
-    border-radius:16px;
+    padding:8px;
     background:rgba(0,0,0,.35);
+    color:#fff;
+    border-radius:14px;
 }
 .day{
-    background:linear-gradient(180deg,#ffffff,#f1f5f9);
-    border-radius:22px;
-    padding:10px;
-    min-height:185px;
-    display:flex;
-    flex-direction:column;
-    font-size:11px;
+    background:#fff;
+    border-radius:20px;
+    padding:8px;
+    min-height:170px;
     border-top:6px solid transparent;
-    transition:.3s;
 }
-.day:hover{transform:translateY(-6px)}
 .day.work{border-color:var(--work)}
 .day.leave{border-color:var(--leave)}
 .day.late{border-color:var(--late)}
@@ -94,96 +129,58 @@ body{
 .date{
     text-align:right;
     font-weight:900;
-    font-size:13px;
-    color:#0f172a;
 }
 
-/* ===== Inputs ===== */
+/* ===== INPUT ===== */
 select,input,textarea{
-    margin-top:6px;
     width:100%;
+    margin-top:5px;
+    padding:6px 8px;
     border:none;
-    border-radius:14px;
-    padding:7px 10px;
-    font-family:inherit;
-    background:rgba(255,255,255,.88);
-    color:#0f172a;
-    box-shadow:
-        inset 0 2px 4px rgba(0,0,0,.12),
-        0 4px 10px rgba(0,0,0,.12);
-    transition:.25s;
-    font-size:16px; /* iOS zoom fix */
-    -webkit-appearance:none;
-    appearance:none;
+    border-radius:12px;
+    background:#f1f5f9;
+    font-size:14px;
 }
-select:focus,input:focus,textarea:focus{
-    outline:none;
-    transform:scale(1.03);
-    box-shadow:
-        0 0 0 2px rgba(96,165,250,.6),
-        inset 0 2px 6px rgba(0,0,0,.18),
-        0 8px 22px rgba(96,165,250,.45);
-}
-textarea{resize:none;min-height:52px}
+textarea{resize:none}
 
-/* ===== Mobile Fix ===== */
-@media (max-width: 600px){
-    body{
-        align-items:flex-start;
-        padding:10px;
-    }
-    .app{
-        width:100%;
-        padding:14px;
-        border-radius:20px;
-    }
-    .header{
-        flex-direction:column;
-        gap:10px;
-    }
-    .header h1{
-        font-size:22px;
-        text-align:center;
-    }
+/* ===== MOBILE ===== */
+@media (max-width:600px){
+    body{align-items:flex-start;padding:10px}
+    .header{flex-direction:column;gap:10px}
     .controls{
-        display:flex;
-        gap:8px;
         width:100%;
+        justify-content:space-between;
     }
-    .controls select{
+    .selectors{
         flex:1;
-        font-size:14px;
     }
-    .calendar{
-        gap:6px;
-    }
-    .day-name{
-        font-size:11px;
-        padding:6px 2px;
-        border-radius:10px;
-    }
-    .day{
-        min-height:140px;
-        padding:6px;
-        border-radius:16px;
-    }
-    .date{
-        font-size:11px;
+    .selectors select{
+        flex:1;
     }
 }
-
-/* Touch smooth */
-.day{touch-action:manipulation}
 </style>
 </head>
 
 <body>
-<div class="app">
+
+<!-- LOGIN -->
+<div id="loginBox">
+    <h2>เข้าสู่ระบบ</h2>
+    <input id="username" placeholder="ชื่อผู้ใช้งาน">
+    <br>
+    <button onclick="login()">เข้าใช้งาน</button>
+</div>
+
+<!-- APP -->
+<div class="app" id="app" style="display:none">
     <div class="header">
         <h1 id="title"></h1>
         <div class="controls">
-            <select id="month"></select>
-            <select id="year"></select>
+            <div class="selectors">
+                <select id="month"></select>
+                <select id="year"></select>
+            </div>
+            <button class="logout" onclick="logout()">Logout</button>
         </div>
     </div>
 
@@ -192,13 +189,35 @@ textarea{resize:none;min-height:52px}
         <div class="day-name">จันทร์</div>
         <div class="day-name">อังคาร</div>
         <div class="day-name">พุธ</div>
-        <div class="day-name">พฤหัสบดี</div>
+        <div class="day-name">พฤหัส</div>
         <div class="day-name">ศุกร์</div>
         <div class="day-name">เสาร์</div>
     </div>
 </div>
 
 <script>
+/* ===== LOGIN SYSTEM ===== */
+let currentUser = localStorage.getItem("wc-user");
+
+function login(){
+    const u = username.value.trim();
+    if(!u){ alert("กรุณาใส่ชื่อผู้ใช้งาน"); return; }
+    currentUser = u;
+    localStorage.setItem("wc-user", u);
+    loginBox.style.display="none";
+    app.style.display="block";
+    render();
+}
+function logout(){
+    localStorage.removeItem("wc-user");
+    location.reload();
+}
+if(currentUser){
+    loginBox.style.display="none";
+    app.style.display="block";
+}
+
+/* ===== CALENDAR ===== */
 const months=["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน",
               "กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
 
@@ -208,14 +227,9 @@ const mSel=document.getElementById("month");
 const ySel=document.getElementById("year");
 
 months.forEach((m,i)=>mSel.add(new Option(m,i)));
-for(let y=2020;y<=2035;y++) ySel.add(new Option(y,y));
+for(let y=2024;y<=2035;y++) ySel.add(new Option(y,y));
 
-const savedMonth=localStorage.getItem("wc-month");
-const savedYear =localStorage.getItem("wc-year");
-if(savedMonth!==null) mSel.value=savedMonth;
-if(savedYear!==null)  ySel.value=savedYear;
-
-const key=(y,m,d)=>`wc-${y}-${m}-${d}`;
+const key=(y,m,d)=>`wc-${currentUser}-${y}-${m}-${d}`;
 const load=k=>JSON.parse(localStorage.getItem(k)||"{}");
 const save=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 
@@ -253,21 +267,21 @@ function render(){
             `;
 
             const els=cell.querySelectorAll("select,input,textarea");
-            const fields=["status","in","out","site","note"];
-            fields.forEach((f,i)=>{ if(data[f]) els[i].value=data[f]; });
+            ["status","in","out","site","note"].forEach((f,i)=>{
+                if(data[f]) els[i].value=data[f];
+            });
             if(data.status) cell.classList.add(data.status);
 
             els.forEach(el=>{
                 el.oninput=()=>{
-                    const dta={
+                    save(k,{
                         status:els[0].value,
                         in:els[1].value,
                         out:els[2].value,
                         site:els[3].value,
                         note:els[4].value
-                    };
-                    save(k,dta);
-                    cell.className="day "+(dta.status||"");
+                    });
+                    cell.className="day "+(els[0].value||"");
                 };
             });
             d++;
@@ -276,18 +290,10 @@ function render(){
     }
 }
 
-mSel.onchange=()=>{ localStorage.setItem("wc-month",mSel.value); render(); };
-ySel.onchange=()=>{ localStorage.setItem("wc-year",ySel.value); render(); };
-
-window.addEventListener("scroll",()=>localStorage.setItem("wc-scroll",window.scrollY));
-window.addEventListener("load",()=>{
-    const y=localStorage.getItem("wc-scroll");
-    if(y) window.scrollTo(0,+y);
-});
-
-document.addEventListener("touchmove",()=>{}, {passive:true});
-
+mSel.onchange=render;
+ySel.onchange=render;
 render();
 </script>
+
 </body>
 </html>
