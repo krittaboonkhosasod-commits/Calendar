@@ -14,6 +14,7 @@
     --off:#94a3b8;
 }
 *{box-sizing:border-box}
+
 body{
     margin:0;
     min-height:100vh;
@@ -32,6 +33,7 @@ body{
     box-shadow:0 20px 50px rgba(0,0,0,.35);
     text-align:center;
 }
+
 #loginBox input{
     width:220px;
     padding:10px;
@@ -40,6 +42,7 @@ body{
     background:#f1f5f9;
     font-size:16px;
 }
+
 #loginBox button{
     margin-top:14px;
     padding:10px 24px;
@@ -65,7 +68,9 @@ body{
     justify-content:space-between;
     align-items:center;
     margin-bottom:16px;
+    gap:12px;
 }
+
 .header h1{
     margin:0;
     font-size:26px;
@@ -78,16 +83,19 @@ body{
     align-items:center;
     gap:12px;
 }
+
 .selectors{
     display:flex;
     gap:8px;
 }
+
 .controls select{
     padding:8px 14px;
     border-radius:18px;
     border:none;
     font-weight:700;
 }
+
 .logout{
     background:#ef4444;
     color:#fff;
@@ -98,7 +106,10 @@ body{
     cursor:pointer;
     white-space:nowrap;
 }
-.logout:hover{opacity:.85}
+
+.logout:hover{
+    opacity:.85;
+}
 
 /* ===== CALENDAR ===== */
 .calendar{
@@ -106,6 +117,7 @@ body{
     grid-template-columns:repeat(7,1fr);
     gap:12px;
 }
+
 .day-name{
     text-align:center;
     font-weight:800;
@@ -114,18 +126,31 @@ body{
     color:#fff;
     border-radius:14px;
 }
+
 .day{
     background:#fff;
     border-radius:20px;
     padding:8px;
     min-height:170px;
     border-top:6px solid transparent;
+    overflow:hidden;
+    transition:.2s;
 }
+
+.day:hover{
+    transform:translateY(-2px);
+}
+
 .day.work{border-color:var(--work)}
 .day.leave{border-color:var(--leave)}
 .day.late{border-color:var(--late)}
 .day.site{border-color:var(--site)}
 .day.off{border-color:var(--off)}
+
+.today{
+    box-shadow:0 0 0 3px #facc15 inset;
+}
+
 .date{
     text-align:right;
     font-weight:900;
@@ -141,21 +166,46 @@ select,input,textarea{
     background:#f1f5f9;
     font-size:14px;
 }
-textarea{resize:none}
+
+textarea{
+    resize:none;
+}
 
 /* ===== MOBILE ===== */
 @media (max-width:600px){
-    body{align-items:flex-start;padding:10px}
-    .header{flex-direction:column;gap:10px}
+
+    body{
+        align-items:flex-start;
+        padding:10px;
+    }
+
+    .header{
+        flex-direction:column;
+    }
+
     .controls{
         width:100%;
         justify-content:space-between;
     }
+
     .selectors{
         flex:1;
     }
+
     .selectors select{
         flex:1;
+    }
+
+    .calendar{
+        grid-template-columns:repeat(1,1fr);
+    }
+
+    .day-name{
+        display:none;
+    }
+
+    .day{
+        min-height:auto;
     }
 }
 </style>
@@ -166,25 +216,38 @@ textarea{resize:none}
 <!-- LOGIN -->
 <div id="loginBox">
     <h2>เข้าสู่ระบบ</h2>
+
     <input id="username" placeholder="ชื่อผู้ใช้งาน">
+
     <br>
+
     <button onclick="login()">เข้าใช้งาน</button>
 </div>
 
 <!-- APP -->
 <div class="app" id="app" style="display:none">
+
     <div class="header">
+
         <h1 id="title"></h1>
+
         <div class="controls">
+
             <div class="selectors">
                 <select id="month"></select>
                 <select id="year"></select>
             </div>
-            <button class="logout" onclick="logout()">Logout</button>
+
+            <button class="logout" onclick="logout()">
+                Logout
+            </button>
+
         </div>
+
     </div>
 
     <div class="calendar" id="calendar">
+
         <div class="day-name">อาทิตย์</div>
         <div class="day-name">จันทร์</div>
         <div class="day-name">อังคาร</div>
@@ -192,67 +255,140 @@ textarea{resize:none}
         <div class="day-name">พฤหัส</div>
         <div class="day-name">ศุกร์</div>
         <div class="day-name">เสาร์</div>
+
     </div>
+
 </div>
 
 <script>
+
 /* ===== LOGIN SYSTEM ===== */
+
 let currentUser = localStorage.getItem("wc-user");
 
+const loginBox = document.getElementById("loginBox");
+const app = document.getElementById("app");
+const username = document.getElementById("username");
+
 function login(){
+
     const u = username.value.trim();
-    if(!u){ alert("กรุณาใส่ชื่อผู้ใช้งาน"); return; }
+
+    if(!u){
+        alert("กรุณาใส่ชื่อผู้ใช้งาน");
+        return;
+    }
+
     currentUser = u;
-    localStorage.setItem("wc-user", u);
-    loginBox.style.display="none";
-    app.style.display="block";
+
+    localStorage.setItem("wc-user",u);
+
+    loginBox.style.display = "none";
+    app.style.display = "block";
+
     render();
 }
+
 function logout(){
+
     localStorage.removeItem("wc-user");
+
     location.reload();
 }
+
 if(currentUser){
-    loginBox.style.display="none";
-    app.style.display="block";
+
+    loginBox.style.display = "none";
+    app.style.display = "block";
 }
 
 /* ===== CALENDAR ===== */
-const months=["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน",
-              "กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
 
-const cal=document.getElementById("calendar");
-const title=document.getElementById("title");
-const mSel=document.getElementById("month");
-const ySel=document.getElementById("year");
+const months = [
+    "มกราคม","กุมภาพันธ์","มีนาคม","เมษายน",
+    "พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม",
+    "กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"
+];
 
-months.forEach((m,i)=>mSel.add(new Option(m,i)));
-for(let y=2024;y<=2035;y++) ySel.add(new Option(y,y));
+const cal = document.getElementById("calendar");
+const title = document.getElementById("title");
+const mSel = document.getElementById("month");
+const ySel = document.getElementById("year");
 
-const key=(y,m,d)=>`wc-${currentUser}-${y}-${m}-${d}`;
-const load=k=>JSON.parse(localStorage.getItem(k)||"{}");
-const save=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+/* ===== CREATE OPTIONS ===== */
+
+months.forEach((m,i)=>{
+    mSel.add(new Option(m,i));
+});
+
+for(let y=2024;y<=2035;y++){
+    ySel.add(new Option(y,y));
+}
+
+/* ===== FIX DEFAULT MONTH/YEAR ===== */
+
+const today = new Date();
+
+mSel.value = today.getMonth();
+ySel.value = today.getFullYear();
+
+/* ===== STORAGE ===== */
+
+const key = (y,m,d)=>
+    `wc-${currentUser}-${y}-${m}-${d}`;
+
+const load = k =>
+    JSON.parse(localStorage.getItem(k) || "{}");
+
+const save = (k,v)=>
+    localStorage.setItem(k,JSON.stringify(v));
+
+/* ===== RENDER ===== */
 
 function render(){
-    cal.querySelectorAll(".day").forEach(e=>e.remove());
-    const m=+mSel.value,y=+ySel.value;
-    title.textContent=`ปฏิทินการทำงาน – ${months[m]} ${y}`;
 
-    const first=new Date(y,m,1).getDay();
-    const days=new Date(y,m+1,0).getDate();
-    let d=1;
+    cal.querySelectorAll(".day").forEach(e=>e.remove());
+
+    const m = +mSel.value;
+    const y = +ySel.value;
+
+    title.textContent =
+        `ปฏิทินการทำงาน – ${months[m]} ${y}`;
+
+    const first =
+        new Date(y,m,1).getDay();
+
+    const days =
+        new Date(y,m+1,0).getDate();
+
+    let d = 1;
 
     for(let i=0;i<42;i++){
-        const cell=document.createElement("div");
-        cell.className="day";
 
-        if(i>=first && d<=days){
-            const k=key(y,m,d);
-            const data=load(k);
+        const cell = document.createElement("div");
 
-            cell.innerHTML=`
+        cell.className = "day";
+
+        if(i >= first && d <= days){
+
+            const k = key(y,m,d);
+
+            const data = load(k);
+
+            const now = new Date();
+
+            if(
+                d === now.getDate() &&
+                m === now.getMonth() &&
+                y === now.getFullYear()
+            ){
+                cell.classList.add("today");
+            }
+
+            cell.innerHTML = `
                 <div class="date">${d}</div>
-                <select>
+
+                <select class="status">
                     <option value="">สถานะ</option>
                     <option value="work">ทำงาน</option>
                     <option value="leave">ลา</option>
@@ -260,39 +396,91 @@ function render(){
                     <option value="site">ออกไซต์</option>
                     <option value="off">หยุด</option>
                 </select>
-                <input type="time">
-                <input type="time">
-                <input placeholder="Site">
-                <textarea placeholder="หมายเหตุ"></textarea>
+
+                <input class="time-in" type="time">
+
+                <input class="time-out" type="time">
+
+                <input class="site-input" placeholder="Site">
+
+                <textarea class="note-input"
+                    placeholder="หมายเหตุ"></textarea>
             `;
 
-            const els=cell.querySelectorAll("select,input,textarea");
-            ["status","in","out","site","note"].forEach((f,i)=>{
-                if(data[f]) els[i].value=data[f];
-            });
-            if(data.status) cell.classList.add(data.status);
+            const statusEl =
+                cell.querySelector(".status");
 
-            els.forEach(el=>{
-                el.oninput=()=>{
-                    save(k,{
-                        status:els[0].value,
-                        in:els[1].value,
-                        out:els[2].value,
-                        site:els[3].value,
-                        note:els[4].value
-                    });
-                    cell.className="day "+(els[0].value||"");
-                };
-            });
+            const inEl =
+                cell.querySelector(".time-in");
+
+            const outEl =
+                cell.querySelector(".time-out");
+
+            const siteEl =
+                cell.querySelector(".site-input");
+
+            const noteEl =
+                cell.querySelector(".note-input");
+
+            /* ===== LOAD DATA ===== */
+
+            if(data.status) statusEl.value = data.status;
+            if(data.in) inEl.value = data.in;
+            if(data.out) outEl.value = data.out;
+            if(data.site) siteEl.value = data.site;
+            if(data.note) noteEl.value = data.note;
+
+            if(data.status){
+                cell.classList.add(data.status);
+            }
+
+            /* ===== SAVE ===== */
+
+            const update = ()=>{
+
+                save(k,{
+                    status:statusEl.value,
+                    in:inEl.value,
+                    out:outEl.value,
+                    site:siteEl.value,
+                    note:noteEl.value
+                });
+
+                cell.className =
+                    "day " +
+                    (statusEl.value || "");
+
+                if(
+                    d === today.getDate() &&
+                    m === today.getMonth() &&
+                    y === today.getFullYear()
+                ){
+                    cell.classList.add("today");
+                }
+            };
+
+            statusEl.oninput = update;
+            inEl.oninput = update;
+            outEl.oninput = update;
+            siteEl.oninput = update;
+            noteEl.oninput = update;
+
             d++;
         }
+
         cal.appendChild(cell);
     }
 }
 
-mSel.onchange=render;
-ySel.onchange=render;
+/* ===== EVENTS ===== */
+
+mSel.onchange = render;
+ySel.onchange = render;
+
+/* ===== START ===== */
+
 render();
+
 </script>
 
 </body>
