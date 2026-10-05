@@ -3,485 +3,342 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Work Calendar (Text Login)</title>
-
+<title>ปฏิทินการทำงาน</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@500;600;700&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-    --work:#22c55e;
-    --leave:#ef4444;
-    --late:#f97316;
-    --site:#2563eb;
-    --off:#94a3b8;
+  --bg:#f4f5f7;--surface:#fff;--ink:#111827;--muted:#6b7280;--line:#e3e6eb;--field:#f1f3f6;
+  --accent:#4338ca;--accent-ink:#fff;
+  --work:#16a34a;--leave:#dc2626;--late:#ea8a00;--site:#2563eb;--off:#7b8494;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
 }
-*{box-sizing:border-box}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e1117;--surface:#171c26;--ink:#e8ebf2;--muted:#8f99ab;--line:#272e3c;--field:#202736;
+  --accent:#8b8cf8;--accent-ink:#0e1117;
+  --work:#3ddc84;--leave:#ff6b6b;--late:#ffb347;--site:#5aa9ff;--off:#9aa4b5}}
+:root[data-theme="dark"]{
+  --bg:#0e1117;--surface:#171c26;--ink:#e8ebf2;--muted:#8f99ab;--line:#272e3c;--field:#202736;
+  --accent:#8b8cf8;--accent-ink:#0e1117;
+  --work:#3ddc84;--leave:#ff6b6b;--late:#ffb347;--site:#5aa9ff;--off:#9aa4b5}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font:16px/1.5 Sarabun,system-ui,sans-serif}
+h1,h2,.num{font-family:Prompt,Sarabun,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+[hidden]{display:none!important}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 14px;cursor:pointer;font-weight:500}
+.btn:hover{border-color:var(--accent)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
 
-body{
-    margin:0;
-    min-height:100vh;
-    font-family:"Segoe UI",system-ui;
-    background:linear-gradient(135deg,#7dd3fc,#a78bfa,#60a5fa);
-    display:flex;
-    justify-content:center;
-    align-items:center;
+/* login */
+.login{min-height:100vh;display:grid;place-items:center;padding:20px}
+.lcard{width:100%;max-width:340px}
+.lcard h1{font-size:30px;margin:0 0 6px;line-height:1.2}
+.lcard p{margin:0 0 22px;color:var(--muted)}
+.lcard input{width:100%;padding:13px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.lcard .btn{width:100%;margin-top:12px;padding:13px}
+
+/* app */
+.app{max-width:1200px;margin:0 auto;padding:18px 16px 40px}
+.bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
+.bar h1{margin:0;font-size:28px;line-height:1.2}
+.nav{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.nav{position:relative}
+.pick{font-family:Prompt,sans-serif;font-weight:600;min-width:150px;text-align:center}
+.pop{position:absolute;top:calc(100% + 8px);left:0;z-index:30;width:290px;max-width:calc(100vw - 32px);background:var(--surface);
+  border:1px solid var(--line);border-radius:16px;padding:12px;box-shadow:0 14px 36px rgba(0,0,0,.2)}
+.pyr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;font-family:Prompt,sans-serif}
+.pyr button{border:0;background:var(--field);width:36px;height:36px;border-radius:10px;cursor:pointer;font-size:18px}
+.pm{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.pm button{border:0;background:var(--field);border-radius:10px;padding:11px 0;cursor:pointer;font-size:14px}
+.pm button.now{box-shadow:inset 0 0 0 1.5px var(--accent)}
+.pm button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);font-weight:600}
+.user{color:var(--muted);display:flex;gap:8px;align-items:center;font-size:14px}
+
+.punch{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;
+  background:var(--ink);color:var(--bg);border-radius:16px;padding:14px 18px;margin-bottom:16px}
+.punch .t{font-family:Prompt,sans-serif;font-weight:600;font-size:18px}
+.punch .s{opacity:.75;font-size:14px}
+.punch .acts{display:flex;gap:8px}
+.punch button{border:0;border-radius:10px;padding:10px 16px;font-weight:600;cursor:pointer;background:var(--bg);color:var(--ink)}
+.punch button.go{background:var(--work);color:#fff}
+
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:20px;align-items:start}
+.stats{display:flex;flex-wrap:wrap;gap:6px 20px;margin-bottom:12px;font-size:14px;color:var(--muted)}
+.stats b{color:var(--ink);font-family:Prompt,sans-serif;font-size:17px;margin-right:3px}
+.stats i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;background:var(--c)}
+
+.grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.dow{text-align:center;font-size:13px;color:var(--muted);padding:4px 0}
+.dow:first-child,.dow:last-child{color:var(--leave)}
+.cell{position:relative;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:12px;
+  min-height:92px;padding:8px 9px;cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden}
+.cell.we{background:var(--field)}
+.cell[data-s]{background:color-mix(in srgb,var(--c) 13%,var(--surface));border-color:color-mix(in srgb,var(--c) 40%,var(--line))}
+.cell .n{font-family:Prompt,sans-serif;font-weight:600;font-size:17px}
+.cell .l{font-size:12px;font-weight:600;color:var(--c)}
+.cell .tm{font-size:11px;color:var(--muted)}
+.cell.today .n{background:var(--accent);color:var(--accent-ink);border-radius:8px;padding:0 7px;align-self:flex-start}
+.cell.sel{outline:2px solid var(--ink);outline-offset:1px}
+
+/* editor */
+.panel{position:sticky;top:14px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px}
+.ph{display:flex;justify-content:space-between;gap:10px;margin-bottom:14px}
+.ph h2{margin:0;font-size:20px;line-height:1.3}
+.ph p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.x{display:none;border:0;background:var(--field);border-radius:10px;width:36px;height:36px;cursor:pointer}
+.seg{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:14px}
+.seg button{border:1px solid var(--line);background:var(--field);border-radius:10px;padding:8px 0;font-size:13px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--c);border-color:var(--c);color:#fff;font-weight:600}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.panel label{display:block;font-size:13px;color:var(--muted);margin-bottom:12px}
+.panel input,.panel textarea{display:block;width:100%;margin-top:4px;padding:10px 12px;border:1px solid var(--line);
+  border-radius:10px;background:var(--field);color:var(--ink)}
+.panel textarea{resize:vertical;min-height:72px}
+.link{border:0;background:none;color:var(--leave);cursor:pointer;padding:0;font-size:14px}
+.hint{color:var(--muted);margin:0}
+.scrim{display:none}
+
+@media (max-width:860px){
+  .layout{grid-template-columns:1fr}
+  .cell{min-height:60px;padding:6px}
+  .cell .l,.cell .tm{display:none}
+  .cell[data-s]::after{content:"";position:absolute;left:6px;right:6px;bottom:5px;height:4px;border-radius:2px;background:var(--c)}
+  .panel{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:20;border-radius:20px 20px 0 0;max-height:85vh;overflow:auto;
+    padding-bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateY(105%);transition:transform .2s}
+  .panel.open{transform:none}
+  .x{display:block}
+  .scrim.open{display:block;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:15}
+  .punch{position:sticky;top:0;z-index:5}
 }
-
-/* ===== LOGIN ===== */
-#loginBox{
-    background:#fff;
-    padding:32px;
-    border-radius:22px;
-    box-shadow:0 20px 50px rgba(0,0,0,.35);
-    text-align:center;
-}
-
-#loginBox input{
-    width:220px;
-    padding:10px;
-    border-radius:14px;
-    border:none;
-    background:#f1f5f9;
-    font-size:16px;
-}
-
-#loginBox button{
-    margin-top:14px;
-    padding:10px 24px;
-    border:none;
-    border-radius:20px;
-    font-weight:800;
-    cursor:pointer;
-}
-
-/* ===== APP ===== */
-.app{
-    width:95%;
-    max-width:1350px;
-    background:rgba(255,255,255,.35);
-    backdrop-filter:blur(22px);
-    border-radius:28px;
-    padding:22px;
-}
-
-/* ===== HEADER ===== */
-.header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:16px;
-    gap:12px;
-}
-
-.header h1{
-    margin:0;
-    font-size:26px;
-    font-weight:900;
-}
-
-/* ===== CONTROLS ===== */
-.controls{
-    display:flex;
-    align-items:center;
-    gap:12px;
-}
-
-.selectors{
-    display:flex;
-    gap:8px;
-}
-
-.controls select{
-    padding:8px 14px;
-    border-radius:18px;
-    border:none;
-    font-weight:700;
-}
-
-.logout{
-    background:#ef4444;
-    color:#fff;
-    font-weight:800;
-    padding:8px 20px;
-    border:none;
-    border-radius:20px;
-    cursor:pointer;
-    white-space:nowrap;
-}
-
-.logout:hover{
-    opacity:.85;
-}
-
-/* ===== CALENDAR ===== */
-.calendar{
-    display:grid;
-    grid-template-columns:repeat(7,1fr);
-    gap:12px;
-}
-
-.day-name{
-    text-align:center;
-    font-weight:800;
-    padding:8px;
-    background:rgba(0,0,0,.35);
-    color:#fff;
-    border-radius:14px;
-}
-
-.day{
-    background:#fff;
-    border-radius:20px;
-    padding:8px;
-    min-height:170px;
-    border-top:6px solid transparent;
-    overflow:hidden;
-    transition:.2s;
-}
-
-.day:hover{
-    transform:translateY(-2px);
-}
-
-.day.work{border-color:var(--work)}
-.day.leave{border-color:var(--leave)}
-.day.late{border-color:var(--late)}
-.day.site{border-color:var(--site)}
-.day.off{border-color:var(--off)}
-
-.today{
-    box-shadow:0 0 0 3px #facc15 inset;
-}
-
-.date{
-    text-align:right;
-    font-weight:900;
-}
-
-/* ===== INPUT ===== */
-select,input,textarea{
-    width:100%;
-    margin-top:5px;
-    padding:6px 8px;
-    border:none;
-    border-radius:12px;
-    background:#f1f5f9;
-    font-size:14px;
-}
-
-textarea{
-    resize:none;
-}
-
-/* ===== MOBILE ===== */
-@media (max-width:600px){
-
-    body{
-        align-items:flex-start;
-        padding:10px;
-    }
-
-    .header{
-        flex-direction:column;
-    }
-
-    .controls{
-        width:100%;
-        justify-content:space-between;
-    }
-
-    .selectors{
-        flex:1;
-    }
-
-    .selectors select{
-        flex:1;
-    }
-
-    .calendar{
-        grid-template-columns:repeat(1,1fr);
-    }
-
-    .day-name{
-        display:none;
-    }
-
-    .day{
-        min-height:auto;
-    }
-}
+@media (prefers-reduced-motion:reduce){.panel{transition:none}}
 </style>
 </head>
-
 <body>
 
-<!-- LOGIN -->
-<div id="loginBox">
-    <h2>เข้าสู่ระบบ</h2>
+<section class="login" id="login">
+  <div class="lcard">
+    <h1>ปฏิทินการทำงาน</h1>
+    <p>ใส่ชื่อผู้ใช้เพื่อเริ่มบันทึกเวลาเข้า-ออกงาน</p>
+    <input id="username" placeholder="ชื่อผู้ใช้งาน" autocomplete="username" aria-label="ชื่อผู้ใช้งาน">
+    <button class="btn pri" id="loginBtn">เข้าใช้งาน</button>
+  </div>
+</section>
 
-    <input id="username" placeholder="ชื่อผู้ใช้งาน">
+<main class="app" id="app" hidden>
+  <header class="bar">
+    <h1 id="title"></h1>
+    <div class="nav">
+      <button class="btn" id="prev" aria-label="เดือนก่อนหน้า">‹</button>
+      <button class="btn pick" id="pick" aria-haspopup="dialog" aria-expanded="false"><span id="pickLbl"></span></button>
+      <div class="pop" id="pop" role="dialog" aria-label="เลือกเดือนและปี" hidden>
+        <div class="pyr"><button id="yPrev" aria-label="ปีก่อนหน้า">‹</button><b id="yLbl"></b><button id="yNext" aria-label="ปีถัดไป">›</button></div>
+        <div class="pm" id="pm"></div>
+      </div>
+      <button class="btn" id="next" aria-label="เดือนถัดไป">›</button>
+      <button class="btn" id="goToday">วันนี้</button>
+    </div>
+    <div class="user"><span id="who"></span><button class="btn" id="logoutBtn">ออกจากระบบ</button></div>
+  </header>
 
-    <br>
+  <section class="punch">
+    <div><div class="t" id="pt"></div><div class="s" id="ps"></div></div>
+    <div class="acts"><button class="go" id="pin">เข้างานตอนนี้</button><button id="pout">ออกงานตอนนี้</button></div>
+  </section>
 
-    <button onclick="login()">เข้าใช้งาน</button>
-</div>
-
-<!-- APP -->
-<div class="app" id="app" style="display:none">
-
-    <div class="header">
-
-        <h1 id="title"></h1>
-
-        <div class="controls">
-
-            <div class="selectors">
-                <select id="month"></select>
-                <select id="year"></select>
-            </div>
-
-            <button class="logout" onclick="logout()">
-                Logout
-            </button>
-
+  <div class="layout">
+    <div>
+      <div class="stats" id="stats"></div>
+      <div class="grid" id="grid"></div>
+    </div>
+    <aside class="panel" id="panel" aria-label="บันทึกรายวัน">
+      <p class="hint" id="empty">เลือกวันในปฏิทินเพื่อบันทึก</p>
+      <div id="edit" hidden>
+        <div class="ph">
+          <div><h2 id="eDate"></h2><p id="eHours"></p></div>
+          <button class="x" id="eClose" aria-label="ปิด">✕</button>
         </div>
-
-    </div>
-
-    <div class="calendar" id="calendar">
-
-        <div class="day-name">อาทิตย์</div>
-        <div class="day-name">จันทร์</div>
-        <div class="day-name">อังคาร</div>
-        <div class="day-name">พุธ</div>
-        <div class="day-name">พฤหัส</div>
-        <div class="day-name">ศุกร์</div>
-        <div class="day-name">เสาร์</div>
-
-    </div>
-
-</div>
+        <div class="seg" id="seg"></div>
+        <div class="row" id="times">
+          <label>เวลาเข้า<input type="time" id="eIn"></label>
+          <label>เวลาออก<input type="time" id="eOut"></label>
+        </div>
+        <label id="siteW">ไซต์งาน<input id="eSite" placeholder="ชื่อไซต์"></label>
+        <label>หมายเหตุ<textarea id="eNote" placeholder="เพิ่มรายละเอียด"></textarea></label>
+        <button class="link" id="eClear">ล้างข้อมูลวันนี้</button>
+      </div>
+    </aside>
+  </div>
+  <div class="scrim" id="scrim"></div>
+</main>
 
 <script>
+const MONTHS=["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+const DOW=["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัสบดี","ศุกร์","เสาร์"];
+const DS=["อา","จ","อ","พ","พฤ","ศ","ส"];
+const ST={work:"ทำงาน",leave:"ลา",late:"มาสาย",site:"ออกไซต์",off:"หยุด"};
+const TIMED=["work","late","site"];
+const DEF_IN="08:00",DEF_OUT="17:30"; // เวลาเริ่มต้น แก้ไขได้ทุกวัน
+const $=id=>document.getElementById(id);
+const mq=matchMedia("(max-width:860px)");
+let user=null,sel=null;
 
-/* ===== LOGIN SYSTEM ===== */
+/* storage (key format unchanged, old data kept) */
+const key=(y,m,d)=>`wc-${user}-${y}-${m}-${d}`;
+function load(k){try{return JSON.parse(localStorage.getItem(k)||"{}")}catch(e){return {}}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+const rec=(y,m,d)=>load(key(y,m,d));
+function patch(y,m,d,p){const v=Object.assign({status:"",in:"",out:"",site:"",note:""},rec(y,m,d),p);save(key(y,m,d),v);return v}
+const hoursOf=r=>{
+  if(!r.in||!r.out)return 0;
+  const a=r.in.split(":"),b=r.out.split(":");
+  const h=((+b[0]*60+ +b[1])-(+a[0]*60+ +a[1]))/60;return h>0?h:0};
+const hhmm=()=>{const n=new Date();return String(n.getHours()).padStart(2,"0")+":"+String(n.getMinutes()).padStart(2,"0")};
+const fmtDate=(y,m,d)=>`${DOW[new Date(y,m,d).getDay()]}ที่ ${d} ${MONTHS[m]} ${y+543}`;
+let CM=0,CY=0;
+const cur=()=>({m:CM,y:CY});
 
-let currentUser = localStorage.getItem("wc-user");
+/* setup */
+$("seg").innerHTML=Object.keys(ST).map(s=>`<button type="button" data-s="${s}" style="--c:var(--${s})" aria-pressed="false">${ST[s]}</button>`).join("");
 
-const loginBox = document.getElementById("loginBox");
-const app = document.getElementById("app");
-const username = document.getElementById("username");
-
-function login(){
-
-    const u = username.value.trim();
-
-    if(!u){
-        alert("กรุณาใส่ชื่อผู้ใช้งาน");
-        return;
-    }
-
-    currentUser = u;
-
-    localStorage.setItem("wc-user",u);
-
-    loginBox.style.display = "none";
-    app.style.display = "block";
-
-    render();
+function goTo(dt,pick){
+  CM=dt.getMonth();CY=dt.getFullYear();
+  const t=new Date();
+  sel=pick||(dt.getMonth()===t.getMonth()&&dt.getFullYear()===t.getFullYear()?t.getDate():null);
+  renderAll();
 }
+const shift=n=>{const c=cur();goTo(new Date(c.y,c.m+n,1))};
 
-function logout(){
-
-    localStorage.removeItem("wc-user");
-
-    location.reload();
+/* login */
+function enter(u){
+  user=u;try{localStorage.setItem("wc-user",u)}catch(e){}
+  $("login").hidden=true;$("app").hidden=false;$("who").textContent=u;goTo(new Date());
 }
+$("loginBtn").onclick=()=>{
+  const u=$("username").value.trim();
+  if(!u){$("username").focus();$("username").placeholder="กรุณาใส่ชื่อผู้ใช้งาน";return}
+  enter(u)};
+$("username").onkeydown=e=>{if(e.key==="Enter")$("loginBtn").click()};
+$("logoutBtn").onclick=()=>{try{localStorage.removeItem("wc-user")}catch(e){}location.reload()};
+$("prev").onclick=()=>shift(-1);$("next").onclick=()=>shift(1);
+$("goToday").onclick=()=>goTo(new Date());
 
-if(currentUser){
 
-    loginBox.style.display = "none";
-    app.style.display = "block";
+/* quick punch */
+function renderPunch(){
+  const t=new Date(),r=rec(t.getFullYear(),t.getMonth(),t.getDate());
+  $("pt").textContent=`วันนี้ ${DS[t.getDay()]}. ${t.getDate()} ${MONTHS[t.getMonth()]}`;
+  const parts=[];
+  if(r.status)parts.push(ST[r.status]);
+  if(r.in)parts.push("เข้า "+r.in);
+  if(r.out)parts.push("ออก "+r.out);
+  $("ps").textContent=parts.length?parts.join(" · "):"ยังไม่ได้บันทึก";
 }
+function punch(kind){
+  const t=new Date(),y=t.getFullYear(),m=t.getMonth(),d=t.getDate(),r=rec(y,m,d);
+  const p={status:r.status&&r.status!=="leave"&&r.status!=="off"?r.status:"work"};
+  if(kind==="in")p.in=hhmm();else p.out=hhmm();
+  patch(y,m,d,p);renderAll();
+}
+$("pin").onclick=()=>punch("in");$("pout").onclick=()=>punch("out");
 
-/* ===== CALENDAR ===== */
+/* grid + stats */
+function renderStats(){
+  const {y,m}=cur(),days=new Date(y,m+1,0).getDate(),n={work:0,leave:0,late:0,site:0,off:0};let h=0;
+  for(let d=1;d<=days;d++){const r=rec(y,m,d);if(r.status)n[r.status]++;h+=hoursOf(r)}
+  $("stats").innerHTML=Object.keys(ST).map(s=>`<span><i style="--c:var(--${s})"></i><b>${n[s]}</b>${ST[s]}</span>`).join("")+
+    `<span><b>${h.toFixed(1)}</b>ชม. รวม</span>`;
+}
+function renderGrid(){
+  const {y,m}=cur(),first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate(),t=new Date();
+  let html=DS.map(n=>`<div class="dow">${n}</div>`).join("");
+  for(let i=0;i<first;i++)html+=`<div></div>`;
+  for(let d=1;d<=days;d++){
+    const r=rec(y,m,d),wd=new Date(y,m,d).getDay();
+    const isT=d===t.getDate()&&m===t.getMonth()&&y===t.getFullYear();
+    const cls=["cell",wd===0||wd===6?"we":"",isT?"today":"",sel===d?"sel":""].join(" ");
+    const tm=r.in||r.out?`${r.in||"--:--"}–${r.out||"--:--"}`:"";
+    html+=`<button class="${cls}" data-d="${d}" ${r.status?`data-s="${r.status}" style="--c:var(--${r.status})"`:""} aria-label="${fmtDate(y,m,d)}${r.status?" "+ST[r.status]:""}">
+      <span class="n">${d}</span><span><span class="l">${r.status?ST[r.status]:""}</span><br><span class="tm">${tm}</span></span></button>`;
+  }
+  $("grid").innerHTML=html;
+}
+$("grid").onclick=e=>{
+  const b=e.target.closest(".cell");if(!b)return;
+  sel=+b.dataset.d;renderGrid();renderEditor();
+  if(mq.matches)openSheet(true);
+};
 
-const months = [
-    "มกราคม","กุมภาพันธ์","มีนาคม","เมษายน",
-    "พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม",
-    "กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"
-];
-
-const cal = document.getElementById("calendar");
-const title = document.getElementById("title");
-const mSel = document.getElementById("month");
-const ySel = document.getElementById("year");
-
-/* ===== CREATE OPTIONS ===== */
-
-months.forEach((m,i)=>{
-    mSel.add(new Option(m,i));
+/* editor */
+function openSheet(on){$("panel").classList.toggle("open",on);$("scrim").classList.toggle("open",on)}
+$("scrim").onclick=$("eClose").onclick=()=>openSheet(false);
+function renderEditor(){
+  const {y,m}=cur();
+  $("empty").hidden=sel!==null;$("edit").hidden=sel===null;
+  if(sel===null)return;
+  const r=rec(y,m,sel);
+  $("eDate").textContent=fmtDate(y,m,sel);
+  $("eIn").value=r.in||"";$("eOut").value=r.out||"";$("eSite").value=r.site||"";$("eNote").value=r.note||"";
+  syncEditor();
+}
+function syncEditor(){
+  const {y,m}=cur(),r=rec(y,m,sel);
+  [...$("seg").children].forEach(b=>b.setAttribute("aria-pressed",b.dataset.s===r.status));
+  $("times").hidden=!TIMED.includes(r.status);
+  $("siteW").hidden=r.status!=="site";
+  const h=hoursOf(r);
+  $("eHours").textContent=h?`ทำงาน ${h.toFixed(1)} ชั่วโมง`:(r.status?ST[r.status]:"ยังไม่ได้เลือกสถานะ");
+}
+function changed(){renderGrid();renderStats();renderPunch();syncEditor()}
+$("seg").onclick=e=>{
+  const b=e.target.closest("button");if(!b)return;
+  const {y,m}=cur(),r=rec(y,m,sel),s=r.status===b.dataset.s?"":b.dataset.s,p={status:s};
+  if(TIMED.includes(s)&&!r.in&&!r.out){p.in=DEF_IN;p.out=DEF_OUT;$("eIn").value=DEF_IN;$("eOut").value=DEF_OUT}
+  patch(y,m,sel,p);changed();
+};
+[["eIn","in"],["eOut","out"],["eSite","site"],["eNote","note"]].forEach(([id,f])=>{
+  $(id).oninput=()=>{const {y,m}=cur();patch(y,m,sel,{[f]:$(id).value});changed()};
 });
+$("eClear").onclick=()=>{
+  const {y,m}=cur();
+  try{localStorage.removeItem(key(y,m,sel))}catch(e){}
+  renderEditor();changed();
+};
 
-for(let y=2024;y<=2035;y++){
-    ySel.add(new Option(y,y));
+function renderAll(){
+  const {y,m}=cur();
+  $("title").textContent=`${MONTHS[m]} ${y+543}`;
+  document.title=`ปฏิทินการทำงาน – ${MONTHS[m]} ${y+543}`;
+  $("pickLbl").textContent=`${MONTHS[m]} ${y+543}`;
+  renderGrid();renderStats();renderPunch();renderEditor();
 }
 
-/* ===== FIX DEFAULT MONTH/YEAR ===== */
-
-const today = new Date();
-
-mSel.value = today.getMonth();
-ySel.value = today.getFullYear();
-
-/* ===== STORAGE ===== */
-
-const key = (y,m,d)=>
-    `wc-${currentUser}-${y}-${m}-${d}`;
-
-const load = k =>
-    JSON.parse(localStorage.getItem(k) || "{}");
-
-const save = (k,v)=>
-    localStorage.setItem(k,JSON.stringify(v));
-
-/* ===== RENDER ===== */
-
-function render(){
-
-    cal.querySelectorAll(".day").forEach(e=>e.remove());
-
-    const m = +mSel.value;
-    const y = +ySel.value;
-
-    title.textContent =
-        `ปฏิทินการทำงาน – ${months[m]} ${y}`;
-
-    const first =
-        new Date(y,m,1).getDay();
-
-    const days =
-        new Date(y,m+1,0).getDate();
-
-    let d = 1;
-
-    for(let i=0;i<42;i++){
-
-        const cell = document.createElement("div");
-
-        cell.className = "day";
-
-        if(i >= first && d <= days){
-
-            const k = key(y,m,d);
-
-            const data = load(k);
-
-            const now = new Date();
-
-            if(
-                d === now.getDate() &&
-                m === now.getMonth() &&
-                y === now.getFullYear()
-            ){
-                cell.classList.add("today");
-            }
-
-            cell.innerHTML = `
-                <div class="date">${d}</div>
-
-                <select class="status">
-                    <option value="">สถานะ</option>
-                    <option value="work">ทำงาน</option>
-                    <option value="leave">ลา</option>
-                    <option value="late">มาสาย</option>
-                    <option value="site">ออกไซต์</option>
-                    <option value="off">หยุด</option>
-                </select>
-
-                <input class="time-in" type="time">
-
-                <input class="time-out" type="time">
-
-                <input class="site-input" placeholder="Site">
-
-                <textarea class="note-input"
-                    placeholder="หมายเหตุ"></textarea>
-            `;
-
-            const statusEl =
-                cell.querySelector(".status");
-
-            const inEl =
-                cell.querySelector(".time-in");
-
-            const outEl =
-                cell.querySelector(".time-out");
-
-            const siteEl =
-                cell.querySelector(".site-input");
-
-            const noteEl =
-                cell.querySelector(".note-input");
-
-            /* ===== LOAD DATA ===== */
-
-            if(data.status) statusEl.value = data.status;
-            if(data.in) inEl.value = data.in;
-            if(data.out) outEl.value = data.out;
-            if(data.site) siteEl.value = data.site;
-            if(data.note) noteEl.value = data.note;
-
-            if(data.status){
-                cell.classList.add(data.status);
-            }
-
-            /* ===== SAVE ===== */
-
-            const update = ()=>{
-
-                save(k,{
-                    status:statusEl.value,
-                    in:inEl.value,
-                    out:outEl.value,
-                    site:siteEl.value,
-                    note:noteEl.value
-                });
-
-                cell.className =
-                    "day " +
-                    (statusEl.value || "");
-
-                if(
-                    d === today.getDate() &&
-                    m === today.getMonth() &&
-                    y === today.getFullYear()
-                ){
-                    cell.classList.add("today");
-                }
-            };
-
-            statusEl.oninput = update;
-            inEl.oninput = update;
-            outEl.oninput = update;
-            siteEl.oninput = update;
-            noteEl.oninput = update;
-
-            d++;
-        }
-
-        cal.appendChild(cell);
-    }
+/* month/year picker */
+let PY=0;
+function drawPop(){
+  const t=new Date();
+  $("yLbl").textContent=PY+543;
+  $("pm").innerHTML=MONTHS.map((n,i)=>`<button data-m="${i}" aria-pressed="${i===CM&&PY===CY}" class="${i===t.getMonth()&&PY===t.getFullYear()?"now":""}">${n}</button>`).join("");
 }
+function togglePop(on){
+  $("pop").hidden=!on;$("pick").setAttribute("aria-expanded",on);
+  if(on){PY=CY;drawPop()}
+}
+$("pick").onclick=e=>{e.stopPropagation();togglePop($("pop").hidden)};
+$("pop").onclick=e=>e.stopPropagation();
+$("yPrev").onclick=()=>{PY--;drawPop()};
+$("yNext").onclick=()=>{PY++;drawPop()};
+$("pm").onclick=e=>{
+  const b=e.target.closest("button");if(!b)return;
+  togglePop(false);goTo(new Date(PY,+b.dataset.m,1));
+};
+document.addEventListener("click",()=>togglePop(false));
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){togglePop(false);openSheet(false)}});
 
-/* ===== EVENTS ===== */
-
-mSel.onchange = render;
-ySel.onchange = render;
-
-/* ===== START ===== */
-
-render();
-
+let saved=null;try{saved=localStorage.getItem("wc-user")}catch(e){}
+if(saved)enter(saved);
 </script>
-
 </body>
 </html>
